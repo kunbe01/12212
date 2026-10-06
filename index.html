@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>bibit_otech — Викторина</title>
+  <meta name="description" content="Интерактивная онлайн-викторина bibit_otech в стиле Kahoot. Соревнуйся с друзьями на скорость и точность!">
+  <meta name="theme-color" content="#250954">
+
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Top App Bar -->
+  <header class="app-header">
+    <div class="header-logo" id="logo-home-btn" role="button" tabindex="0">
+      <span class="logo-bolt">⚡</span>
+      <span class="logo-text">bibit_<span>otech</span></span>
+    </div>
+    <div class="header-actions">
+      <button id="sound-toggle-btn" class="icon-btn" title="Вкл/Выкл звук" aria-label="Звук">
+        <span id="sound-icon">🔊</span>
+      </button>
+      <div id="player-badge" class="header-player-badge hidden">
+        <span id="badge-avatar">🦊</span>
+        <span id="badge-nick">Игрок</span>
+        <span id="badge-score" class="badge-score">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="app-main">
+
+    <!-- ================= 1. HOME SCREEN (SIMPLE ENTRY) ================= -->
+    <section id="screen-home" class="screen-view active">
+      <div class="hero-container">
+        <div class="hero-tag">🔥 Официальная Викторина</div>
+        <h1 class="hero-title">bibit_otech</h1>
+        <p class="hero-subtitle">Отвечай быстрее всех! Чем выше скорость и точнее ответ — тем больше баллов в итоговой таблице.</p>
+      </div>
+
+      <!-- Focused Join Card -->
+      <div class="simple-join-card glass-panel">
+        <form id="start-game-form" class="styled-form">
+          <div class="form-group">
+            <label for="player-nick-input">Введи свой никнейм:</label>
+            <div class="input-with-button">
+              <input type="text" id="player-nick-input" maxlength="15" placeholder="Твой ник..." required autocomplete="off" autofocus>
+              <button type="button" id="random-nick-btn" class="btn-ghost" title="Случайный ник">🎲</button>
+            </div>
+          </div>
+
+          <div class="nick-hint">
+            <span>Твой случайный аватар: <strong id="assigned-avatar-display">🦊</strong></span>
+          </div>
+
+          <button type="submit" id="btn-start-game" class="btn-primary touch-btn btn-large w-100">
+            <span>НАЧАТЬ ИГРУ</span> 🚀
+          </button>
+
+          <button type="button" id="btn-view-leaderboard" class="btn-outline touch-btn w-100">
+            📊 Таблица лидеров
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= 2. QUESTION SCREEN (TOUCH SENSE) ================= -->
+    <section id="screen-question" class="screen-view">
+      <!-- Top info bar -->
+      <div class="q-top-bar">
+        <div class="q-counter-badge" id="q-counter">Вопрос 1 / 5</div>
+        <div class="q-timer-container">
+          <div class="q-timer-ring">
+            <svg viewBox="0 0 100 100">
+              <circle class="timer-bg" cx="50" cy="50" r="44"></circle>
+              <circle id="timer-progress-circle" class="timer-progress" cx="50" cy="50" r="44"></circle>
+            </svg>
+            <span id="timer-number" class="timer-number">20</span>
+          </div>
+        </div>
+        <div class="q-streak-badge" id="q-streak-badge">
+          <span class="streak-icon">🔥</span>
+          <span id="q-streak-count">x0</span>
+        </div>
+      </div>
+
+      <!-- Question Text Banner -->
+      <div class="question-card glass-panel">
+        <h2 id="q-text" class="question-text">Загрузка вопроса...</h2>
+      </div>
+
+      <!-- 4 Touch Answer Buttons (Kahoot Colors) -->
+      <div class="answers-grid" id="answers-grid">
+        <!-- RED ▲ -->
+        <button class="answer-btn answer-red touch-interactive" data-index="0" id="btn-ans-0">
+          <div class="btn-shape shape-triangle">▲</div>
+          <div class="btn-content">
+            <span class="ans-label" id="ans-text-0">Вариант 1</span>
+          </div>
+          <div class="ripple-wave"></div>
+        </button>
+
+        <!-- BLUE ◆ -->
+        <button class="answer-btn answer-blue touch-interactive" data-index="1" id="btn-ans-1">
+          <div class="btn-shape shape-diamond">◆</div>
+          <div class="btn-content">
+            <span class="ans-label" id="ans-text-1">Вариант 2</span>
+          </div>
+          <div class="ripple-wave"></div>
+        </button>
+
+        <!-- YELLOW ● -->
+        <button class="answer-btn answer-yellow touch-interactive" data-index="2" id="btn-ans-2">
+          <div class="btn-shape shape-circle">●</div>
+          <div class="btn-content">
+            <span class="ans-label" id="ans-text-2">Вариант 3</span>
+          </div>
+          <div class="ripple-wave"></div>
+        </button>
+
+        <!-- GREEN ■ -->
+        <button class="answer-btn answer-green touch-interactive" data-index="3" id="btn-ans-3">
+          <div class="btn-shape shape-square">■</div>
+          <div class="btn-content">
+            <span class="ans-label" id="ans-text-3">Вариант 4</span>
+          </div>
+          <div class="ripple-wave"></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 3. ROUND RESULT SCREEN ================= -->
+    <section id="screen-round-result" class="screen-view">
+      <div class="round-result-card glass-panel" id="round-result-card">
+        <div class="result-feedback-icon" id="result-status-icon">✅</div>
+        <h2 id="result-status-title" class="result-status-title">Отлично!</h2>
+        
+        <div class="result-points-box" id="result-points-box">
+          <span class="points-plus">+</span>
+          <span id="result-points-value" class="points-num">950</span>
+          <span class="points-label">баллов</span>
+        </div>
+
+        <div class="result-streak-alert hidden" id="result-streak-alert">
+          🔥 Серия верных ответов: <strong id="result-streak-num">3</strong> в ряд!
+        </div>
+
+        <div class="result-meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Время ответа:</span>
+            <span id="result-time-num" class="meta-val">1.8с</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Всего очков:</span>
+            <span id="result-total-score" class="meta-val">950</span>
+          </div>
+        </div>
+
+        <button id="btn-next-question" class="btn-primary touch-btn btn-large w-100">
+          <span>Следующий вопрос</span> ⏩
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 4. FINAL RESULTS / PODIUM & LEADERBOARD ================= -->
+    <section id="screen-podium-results" class="screen-view">
+      <div class="final-header text-center">
+        <h1 class="final-title">🏆 Результаты bibit_otech</h1>
+        <p class="final-subtitle">Итоговая таблица всех участников</p>
+      </div>
+
+      <!-- 3D Podium Container -->
+      <div class="podium-wrapper" id="podium-wrapper">
+        <!-- 2nd place -->
+        <div class="podium-step step-2" id="podium-step-2">
+          <div class="podium-avatar" id="podium-avatar-2">🥈</div>
+          <div class="podium-name" id="podium-name-2">---</div>
+          <div class="podium-score" id="podium-score-2">0 pts</div>
+          <div class="podium-pillar pillar-2">2</div>
+        </div>
+
+        <!-- 1st place -->
+        <div class="podium-step step-1" id="podium-step-1">
+          <div class="podium-crown">👑</div>
+          <div class="podium-avatar" id="podium-avatar-1">🥇</div>
+          <div class="podium-name" id="podium-name-1">---</div>
+          <div class="podium-score" id="podium-score-1">0 pts</div>
+          <div class="podium-pillar pillar-1">1</div>
+        </div>
+
+        <!-- 3rd place -->
+        <div class="podium-step step-3" id="podium-step-3">
+          <div class="podium-avatar" id="podium-avatar-3">🥉</div>
+          <div class="podium-name" id="podium-name-3">---</div>
+          <div class="podium-score" id="podium-score-3">0 pts</div>
+          <div class="podium-pillar pillar-3">3</div>
+        </div>
+      </div>
+
+      <!-- Comprehensive Results Table Card -->
+      <div class="table-results-card glass-panel">
+        <div class="table-header-bar">
+          <h3>📊 Таблица участников</h3>
+          <div class="table-actions">
+            <input type="text" id="table-search-input" placeholder="Поиск ника..." class="table-search">
+            <button id="btn-export-csv" class="btn-ghost" title="Скачать CSV">📥 CSV</button>
+          </div>
+        </div>
+
+        <div class="table-responsive-wrapper">
+          <table class="styled-leaderboard-table" id="leaderboard-table">
+            <thead>
+              <tr>
+                <th class="th-rank">#</th>
+                <th class="th-player">Участник</th>
+                <th class="th-score">Баллы</th>
+                <th class="th-correct">Правильно</th>
+                <th class="th-acc">Точность</th>
+                <th class="th-speed">Ср. скорость</th>
+                <th class="th-streak">Серия 🔥</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="final-nav-buttons">
+          <button id="btn-play-again" class="btn-primary touch-btn">
+            🔄 Сыграть снова
+          </button>
+          <button id="btn-back-home" class="btn-secondary touch-btn">
+            🏠 Главная
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Audio & Script files -->
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
